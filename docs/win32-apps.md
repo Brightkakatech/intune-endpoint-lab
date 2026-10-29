@@ -31,9 +31,13 @@ D:\Packaging\
 
 | Item | Value |
 |---|---|
-| Version packaged | _record the version you downloaded_ |
-| Source file | _record the file name, e.g. 7z….-x64.msi_ |
-| Install command | `msiexec /i "<file>.msi" /qn` |
+| Version packaged | 26.05 (released 21 October 2026) |
+| Source | 7-zip.org, Download page, 64-bit x64 MSI |
+| Source file | `7z2605-x64.msi` |
+| SHA-256 | `3FE4AB99FA15629C652944309A2B2BC6E41FC933FC6B63F5DF1EBCF3AEA68263` |
+| Digital signature | Not signed (normal for 7-Zip's MSI). Downloaded only from the official site, and the hash is recorded so the exact file can be verified. |
+| Package | `7z2605-x64.intunewin` (1.9 MB) |
+| Install command | `msiexec /i "7z2605-x64.msi" /qn` |
 | Uninstall command | `msiexec /x {ProductCode} /qn` |
 | Detection rule | **MSI product code** (Intune reads it from the MSI automatically when you upload the package) |
 | Install context | System |
@@ -45,9 +49,13 @@ D:\Packaging\
 
 | Item | Value |
 |---|---|
-| Version packaged | _record the version you downloaded_ |
-| Source file | _record the file name, e.g. npp.….Installer.x64.exe_ |
-| Install command | `"<file>.exe" /S` |
+| Version packaged | 8.9.8 (file version 8.9.8.0) |
+| Source | notepad-plus-plus.org, Downloads, 64-bit x64 installer |
+| Source file | `npp.8.9.8.Installer.x64.exe` |
+| SHA-256 | `7B2A949BF460FB37A3888C9048698F43222A185A48323023DF1C51E78A3CA1C2` |
+| Digital signature | Valid, signed by NOTEPAD++ (Paris, France) |
+| Package | `npp.8.9.8.Installer.x64.intunewin` (6.5 MB) |
+| Install command | `"npp.8.9.8.Installer.x64.exe" /S` |
 | Uninstall command | `"%ProgramFiles%\Notepad++\uninstall.exe" /S` |
 | Detection rule | **File**: path `%ProgramFiles%\Notepad++`, file `notepad++.exe`, detection method *File or folder exists* |
 | Install context | System |
@@ -57,9 +65,11 @@ D:\Packaging\
 
 ## Packaging commands
 
+Packaging tool: Microsoft Win32 Content Prep Tool 1.8.7, from Microsoft's official GitHub repository. Its Authenticode signature was checked before use (Valid, Microsoft Corporation).
+
 ```powershell
-D:\Packaging\Tools\IntuneWinAppUtil.exe -c D:\Packaging\Source\7zip -s <7-zip file>.msi -o D:\Packaging\Output -q
-D:\Packaging\Tools\IntuneWinAppUtil.exe -c D:\Packaging\Source\notepadpp -s <notepad++ file>.exe -o D:\Packaging\Output -q
+D:\Packaging\Tools\IntuneWinAppUtil.exe -c D:\Packaging\Source\7zip -s 7z2605-x64.msi -o D:\Packaging\Output -q
+D:\Packaging\Tools\IntuneWinAppUtil.exe -c D:\Packaging\Source\notepadpp -s npp.8.9.8.Installer.x64.exe -o D:\Packaging\Output -q
 ```
 
 | Switch | Meaning |
@@ -68,6 +78,22 @@ D:\Packaging\Tools\IntuneWinAppUtil.exe -c D:\Packaging\Source\notepadpp -s <not
 | `-s` | The setup file inside that folder |
 | `-o` | Output folder for the `.intunewin` file |
 | `-q` | Quiet mode, no prompts |
+
+For each app, the tool compresses the source folder, encrypts it, computes SHA-256 hashes so Intune can check the package arrives intact, and writes a `Detection.xml` metadata file. For an MSI, that metadata includes the product code, which Intune reads when the package is uploaded.
+
+## How the installers were verified
+
+```powershell
+# Digital signatures
+Get-ChildItem D:\Packaging\Source -Recurse -File | Get-AuthenticodeSignature |
+    Select-Object @{n='File';e={Split-Path $_.Path -Leaf}}, Status, @{n='Signer';e={$_.SignerCertificate.Subject}}
+
+# SHA-256 fingerprints
+Get-ChildItem D:\Packaging\Source -Recurse -File | Get-FileHash -Algorithm SHA256 |
+    Select-Object @{n='File';e={Split-Path $_.Path -Leaf}}, Hash
+```
+
+**Why this matters:** an installer deployed through Intune runs as SYSTEM on every assigned device. A tampered installer would spread malware to the whole fleet at once, which is how software supply chain attacks work. Checking signatures, using only official sources and recording hashes reduces that risk.
 
 ## Results (filled in during the trial)
 
