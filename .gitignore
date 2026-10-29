@@ -1,0 +1,19 @@
+# App installers and packaged Intune files (large binaries, not source code)
+*.intunewin
+*.msi
+*.exe
+packages/
+
+# Raw exports before sanitising (tenant IDs, emails)
+intune-export-raw/
+*.raw.json
+
+# Secrets and local settings
+.env
+*.pfx
+*.key
+
+# Editor and OS files
+.vscode/
+.DS_Store
+Thumbs.db
