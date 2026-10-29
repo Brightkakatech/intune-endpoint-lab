@@ -56,7 +56,7 @@ _Added during the build._
 
 - **Remediations licensing:** Remediations require Windows Enterprise E3/E5 (or equivalent). Business Premium is not on Microsoft's list, so the scripts may be deployed as Platform scripts instead.
 - **One device:** policies are tested on a single VM. The broad update ring is designed but not assigned.
-- **Short ASR review:** 3–5 days of audit data on one device, enough to show the method.
+- **Short ASR review:** 3 to 5 days of audit data on one device, enough to show the method.
 
 ## Teardown
 

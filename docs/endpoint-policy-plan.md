@@ -1,6 +1,6 @@
 # Endpoint policy plan
 
-BrightKaka Tech — Intune and Defender endpoint lab
+BrightKaka Tech: Intune and Defender endpoint lab
 Status: **Draft (pre-trial)**. Actual results are recorded during the trial.
 
 ## How the pieces fit together
@@ -124,7 +124,7 @@ ASR rules block behaviours that malware commonly uses, such as an Office documen
 |---|---|---|---|
 | | | | |
 
-**Lab limitation:** a real company reviews audit data for weeks across many devices. This lab reviews 3–5 days on one VM, which is enough to show the method.
+**Lab limitation:** a real company reviews audit data for weeks across many devices. This lab reviews 3 to 5 days on one VM, which is enough to show the method.
 
 ## 7. Remediations (detection and fix scripts)
 
